@@ -93,6 +93,7 @@ operators_pattern = re.compile('|'.join(re.escape(op) for op in operators))
 separators_pattern = re.compile('|'.join(re.escape(op) for op in separators))
 directives_pattern = re.compile('|'.join(list(directives.keys())))
 functions_pattern = re.compile('|'.join(list(functions.keys())))
+
 identifier_pattern = re.compile(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b')
 float_pattern = re.compile(r'\b\d+\.\d+\b')
 int_pattern = re.compile(r'\b\d+\b')
