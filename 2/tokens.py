@@ -20,15 +20,15 @@ keywords = {
 }
 
 datatypes = {
-    'bool': 'data type',
-    'char': 'data type',
-    'double': 'data type',
-    'enum': 'data type',
-    'float': 'data type',
-    'int': 'data type',
-    'long': 'data type',
-    'short': 'data type',
-    'string': 'data type',
+    'bool': 'Boolean data type',
+    'char': 'Char data type',
+    'double': 'Double data type',
+    'enum': 'Enum data type',
+    'float': 'Float data type',
+    'int': 'Int data type',
+    'long': 'Long data type',
+    'short': 'Short data type',
+    'string': 'String data type',
 }
 
 operators = {
@@ -83,6 +83,7 @@ directives = {
 }
 
 functions = {
+    'main': 'Main function',
     'printf': 'Output function',
     'scanf': 'Input function'
 }
@@ -99,6 +100,7 @@ float_pattern = re.compile(r'\b\d+\.\d+\b')
 int_pattern = re.compile(r'\b\d+\b')
 string_pattern = re.compile(r'\".*?\"')
 char_pattern = re.compile(r"'(?:\\.|[^\\'])*'")
+
 
 pattern = re.compile(identifier_pattern.pattern + '|' + keyword_pattern.pattern + '|'
                           + datatype_pattern.pattern + '|'

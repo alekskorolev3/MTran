@@ -1,18 +1,20 @@
 int main() {
-   int i, n, a = 0, b = 'a', c;
+   int i = 0;
+
+   float c = 2.75;
 
    for (i = 1; i <= 20; i++) {
       if (i == 1) {
-         printf(a);
+         printf(c);
          continue;
       }
       if (i == 2) {
-         printf(b);
+         printf(c);
          continue;
       }
-      c = a + b;
-      a = b;
-      b = c;
+      c = i + c;
+      c = i;
+      i = c;
       printf(c);
    }
 
