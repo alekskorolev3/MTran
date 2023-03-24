@@ -32,22 +32,12 @@ datatypes = {
 }
 
 operators = {
-    '+': 'Arithmetic operator',
-    '-': 'Arithmetic operator',
-    '*': 'Arithmetic operator',
-    '/': 'Arithmetic operator',
-    '%': 'Arithmetic operator',
-    '++': 'Arithmetic operator',
-    '--': 'Arithmetic operator',
-    '==': 'Relational operator',
-    '!=': 'Relational operator',
-    '<': 'Relational operator',
-    '>': 'Relational operator',
     '<=': 'Relational operator',
     '>=': 'Relational operator',
     '&&': 'Logical operator',
     '||': 'Logical operator',
     '!': 'Logical operator',
+    '==': 'Relational operator',
     '=': 'Assigment operator',
     '+=': 'Assigment operator',
     '-=': 'Assigment operator',
@@ -59,6 +49,16 @@ operators = {
     '&=': 'Assigment operator',
     '^=': 'Assigment operator',
     '|=': 'Assigment operator',
+    '++': 'Arithmetic operator',
+    '--': 'Arithmetic operator',
+    '!=': 'Relational operator',
+    '+': 'Arithmetic operator',
+    '-': 'Arithmetic operator',
+    '*': 'Arithmetic operator',
+    '/': 'Arithmetic operator',
+    '%': 'Arithmetic operator',
+    '<': 'Relational operator',
+    '>': 'Relational operator'
 }
 
 separators = {
