@@ -26,11 +26,17 @@ functions_table = []
 
 set_of_tokens = extract_tokens(text)
 
+_func = False
+
 for i, token in enumerate(set_of_tokens):
 
     if token[2] in tokens.keywords:
-        keywords_table.append((token[2], tokens.keywords[token[2]]))
-        continue
+        if set_of_tokens[i - 1][2] not in tokens.datatypes:
+            keywords_table.append((token[2], tokens.keywords[token[2]]))
+            continue
+        else:
+            raise SyntaxError("You cannot use keywords as identifiers!" + str(token[0]) + str(token[1]))
+
     if token[2] in tokens.operators:
         operators_table.append((token[2], tokens.operators[token[2]]))
         continue
@@ -44,19 +50,51 @@ for i, token in enumerate(set_of_tokens):
         directives_table.append((token[2], tokens.directives[token[2]]))
         continue
 
-
+    if set_of_tokens[i - 1][2] == ")":
+        _func = False
 
     if re.search(tokens.identifier_pattern.pattern, token[2]):
         if token[2] not in identifiers_table:
             if set_of_tokens[i + 1][2] == "(":
+                _func = True
                 functions_table.append(token[2])
+                continue
             elif set_of_tokens[i - 1][2] in tokens.datatypes:
                 identifiers_table.append(token[2])
+                continue
             else:
                 raise SyntaxError("Undefined identifier " + str(token[0]) + str(token[1]))
         else:
-            continue
+            if set_of_tokens[i - 1][2] in tokens.datatypes:
+                raise SyntaxError("Duplicat identifier " + str(token[0]) + str(token[1]))
 
+    if re.search(tokens.float_pattern.pattern, token[2]):
+        if set_of_tokens[i - 1][2] in tokens.operators:
+            constants_table.append((token[2], "Identifier of float type"))
+            continue
+        elif _func:
+            constants_table.append((token[2], "Constant"))
+            continue
+        elif set_of_tokens[i - 1][2] == "return":
+            constants_table.append((token[2], "Constant"))
+            continue
+        else:
+            raise SyntaxError(
+                str(token[0] + 1) + ":" + str(token[1]) + " Error: Expected identifier before constant")
+
+    if re.search(tokens.int_pattern.pattern, token[2]):
+        if set_of_tokens[i - 1][2] in tokens.operators:
+            constants_table.append((token[2], "Identifier of int type"))
+            continue
+        elif _func:
+            constants_table.append((token[2], "Constant"))
+            continue
+        elif set_of_tokens[i - 1][2] == "return":
+            constants_table.append((token[2], "Constant"))
+            continue
+        else:
+            raise SyntaxError(
+                str(token[0] + 1) + ":" + str(token[1]) + " Error: Expected identifier before constant")
 
 print("Identifiers", identifiers_table)
 print("Constants", constants_table)
