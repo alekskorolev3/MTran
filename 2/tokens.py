@@ -1,5 +1,6 @@
 import re
 
+
 keywords = {
     'break': 'Break statement',
     'case': 'Case statement',
@@ -59,6 +60,16 @@ operators = {
     '%': 'Arithmetic operator',
     '<': 'Relational operator',
     '>': 'Relational operator'
+}
+
+opened = {
+    '{': 'Separator',
+    '(': 'Separator',
+}
+
+closing = {
+    ';': 'Separator',
+    '}': 'Separator',
 }
 
 separators = {
