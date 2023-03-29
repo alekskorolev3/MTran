@@ -1,4 +1,8 @@
+import ply.yacc as yacc
 import re
+import rules
+from ply import lex
+from ply.lex import TOKEN
 
 
 keywords = {
@@ -112,13 +116,14 @@ int_pattern = re.compile(r'\b\d+\b')
 string_pattern = re.compile(r'\".*?\"')
 char_pattern = re.compile(r"'(?:\\.|[^\\'])*'")
 
-
 pattern = re.compile(identifier_pattern.pattern + '|' + keyword_pattern.pattern + '|'
-                          + datatype_pattern.pattern + '|'
-                          + operators_pattern.pattern + '|'
-                          + separators_pattern.pattern + '|'
-                          + directives_pattern.pattern + '|'
-                          + functions_pattern.pattern + '|'
-                          + float_pattern.pattern + '|'
-                          + int_pattern.pattern + '|'
-                          + string_pattern.pattern + '|' + char_pattern.pattern)
+                     + datatype_pattern.pattern + '|'
+                     + operators_pattern.pattern + '|'
+                     + separators_pattern.pattern + '|'
+                     + directives_pattern.pattern + '|'
+                     + functions_pattern.pattern + '|'
+                     + float_pattern.pattern + '|'
+                     + int_pattern.pattern + '|'
+                     + string_pattern.pattern + '|' + char_pattern.pattern)
+
+lexer = lex.lex(module=rules)
