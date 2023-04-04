@@ -2,7 +2,7 @@ from ply import yacc
 from rules import tokens
 
 
-class LALR1Parser:
+class Parser:
     def __init__(self, text):
         self.text = text
         self.parser = yacc.yacc()
@@ -41,7 +41,7 @@ def p_function(p):
 
 def p_func_header(p):
     """func_header : DATA_TYPE FUNCDECL LPAR args RPAR"""
-    p[0] = Node("func_declaration", [p[1], p[2], p[4]])
+    p[0] = Node("func_header", [p[1], p[2], p[4]])
 
 
 def p_args(p):
@@ -78,32 +78,32 @@ def p_semicolons(p):
 
 def p_multiline(p):
     """multiline : if_statement
-    | while_statement
-    | for_statement"""
+                 | while_statement
+                 | for_statement"""
     p[0] = p[1]
 
 
 def p_line(p):
-    """line : modal_function
-    | init
-    | func
-    | assign"""
+    """line : jump_statement
+            | init
+            | func
+            | assign"""
     p[0] = p[1]
 
 
-def p_modal_function(p):
-    """modal_function : RETURN arg
-    | BREAK
-    | CONTINUE"""
+def p_jump_statement(p):
+    """jump_statement : RETURN arg
+                      | BREAK
+                      | CONTINUE"""
     if len(p) == 3:
-        p[0] = Node("modal_function", p[1:])
+        p[0] = Node("jump_statement", p[1:])
     else:
-        p[0] = Node("modal_function", [p[1]])
+        p[0] = Node("jump_statement", [p[1]])
 
 
-def p_var_call(p):
-    """var_cal : ID LCUADR expr RCUADR"""
-    p[0] = Node("var_call", [p[1], p[3]])
+def p_indexing_op(p):
+    """indexing_op : ID LCUADR expr RCUADR"""
+    p[0] = Node("indexing_op", [p[1], p[3]])
 
 
 def p_if_statement(p):
@@ -148,9 +148,8 @@ def p_cond_sign(p):
 def p_init(p):
     """init :
     | DATA_TYPE ID SEMICOLON
-    | DATA_TYPE ID EQUAL ID DIVMUL NUMBER
     | DATA_TYPE ID EQUAL expr
-    | DATA_TYPE ID EQUAL var_cal
+    | DATA_TYPE ID EQUAL indexing_op
     | DATA_TYPE ID LCUADR RCUADR EQUAL array_init"""
     if len(p) > 5:
         p[0] = Node("init", [p[1], p[2], "[]", p[5], p[6]])
@@ -179,10 +178,9 @@ def p_init_block(p):
 
 def p_assign(p):
     """assign : ID EQUAL expr
-    | ID EQUAL var_cal
-    | var_cal EQUAL expr
-    | var_cal EQUAL var_cal
-    | ID expr"""
+              | ID EQUAL indexing_op
+              | indexing_op EQUAL expr
+              | indexing_op EQUAL indexing_op"""
     if len(p) == 5:
         p[0] = Node("assign", [p[2], p[4]])
     elif len(p) == 4 or len(p) == 3:
@@ -193,8 +191,8 @@ def p_assign(p):
 
 def p_func(p):
     """func : CUSTOM_FUNC LPAR args RPAR
-    | ID LPAR args RPAR
-    | BUILD_IN LPAR args RPAR"""
+            | ID LPAR args RPAR
+            | BUILD_IN LPAR args RPAR"""
     if len(p) == 3:
         p[0] = Node("func_call", [p[1], p[2]])
     else:
@@ -207,6 +205,9 @@ def p_expr(p):
     | expr PLUSMINUS fact
     | expr MOD fact
     | ID PLUSMINUS ID
+    | ID PLUSMINUS fact
+    | ID DIVMUL fact
+    | fact DIVMUL ID
     | ID
     """
     if len(p) == 2:
@@ -244,7 +245,7 @@ def p_arg(p):
            | DATA_TYPE ID
            | DATA_TYPE ID LCUADR RCUADR
            | ID LCUADR RCUADR
-           | var_cal
+           | indexing_op
            | NUMBER ID
            | func"""
     if len(p) == 2:

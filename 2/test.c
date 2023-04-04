@@ -1,9 +1,9 @@
 int main()
 {
 
-   int i = 0;
+   int i[] = {1,2,3,4};
 
-   int b = i * 3;
+   int b = i[0];
 
    float c = 2.75;
 
@@ -19,7 +19,7 @@ int main()
          printf(c);
          continue;
       }
-      c = i + c;
+      c = (i + c) * 2;
       c = i;
       i = c;
       printf(c);

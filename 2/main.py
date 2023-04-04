@@ -2,6 +2,8 @@ import re
 import prettytable
 import tokens
 import parser
+import semantic_analyzer
+
 
 
 def extract_tokens(text):
@@ -209,12 +211,15 @@ def lexical_analysis(text):
 
 
 with open('/Users/artem/PycharmProjects/MTran/second/2/test.c', 'r') as f:
-    text = f.read()
+    t = f.read()
 
-lexical_analysis(text)
+lexical_analysis(t)
 
-parser = parser.LALR1Parser(text)
-parser.parse()
+parser = parser.Parser(t)
+tree = parser.parse()
+
+semantic_analyzer = semantic_analyzer.SemanticAnalyzer()
+semantic_analyzer.analyze(tree)
 
 
 
