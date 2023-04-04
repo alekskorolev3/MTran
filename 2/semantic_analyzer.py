@@ -16,7 +16,6 @@ class SemanticAnalyzer:
         if tree_type in self.operations:
             return self.analyze(tree)
 
-
     def analyze(self, tree, _type=None):
         try:
             tree_type = tree.type
@@ -25,9 +24,12 @@ class SemanticAnalyzer:
         except AttributeError:
             return tree
 
-        if tree_type in self.operations:
+        if tree_type in self.operations or tree_type == "condition":
             left_op = children[0]
-            right_op = children[1]
+            if tree_type == "condition":
+                right_op = children[-1]
+            else:
+                right_op = children[1]
 
             if left_op in self.variables.keys():
                 lt = self.variables.get(left_op).get("type")
@@ -48,6 +50,7 @@ class SemanticAnalyzer:
             if _type is not None:
                 if type(children[0]).__name__ != _type:
                     raise SyntaxError("Mismatched types" + str(children[0]))
+                return
 
         if tree_type == "init":
             self.variables[children[1]] = {"type": children[0], "value": children[1]}
@@ -57,7 +60,9 @@ class SemanticAnalyzer:
             return
 
         if tree_type == "assign":
-            print("assign")
+            self.analyze(children[-1], self.variables.get(children[0]).get("type"))
+            return
+
 
         for child in children:
             if child != "=":
