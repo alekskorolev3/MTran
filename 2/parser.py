@@ -9,7 +9,7 @@ class Parser:
 
     def parse(self):
         tree = self.parser.parse(self.text)
-        print(tree)
+        return tree
 
 
 class Node:
