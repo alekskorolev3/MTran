@@ -41,13 +41,26 @@ class SemanticAnalyzer:
             else:
                 rt = self.gettype(right_op)
 
+            if _type == "float":
+                if (lt == "float" and rt == "int") or (lt == "int" and rt == "float"):
+                    return
+
             if lt != rt:
                 raise SyntaxError("Mismatch types in " + str(tree_type) + ": " + str(lt) + " and " + str(rt))
             else:
+                if _type is not None:
+                    if _type != lt:
+                        raise SyntaxError("Type " + str(_type) + " cannot initialize " + str(lt))
+                    return lt
                 return lt
+
 
         if tree_type == "arg":
             if _type is not None:
+
+                if _type == "float" and type(children[0]).__name__ == "int":
+                    return
+
                 if type(children[0]).__name__ != _type:
                     raise SyntaxError("Type " + str(_type) + " cannot initialize " + str(children[0]))
                 return
@@ -67,7 +80,7 @@ class SemanticAnalyzer:
 
             if children[0] in self.variables.keys():
                 if self.variables.get(children[0]).get("type") != _type:
-                    raise SyntaxError("Mismatch types on initialization")
+                    raise SyntaxError("Mismatch types on array initialization")
 
             if self.gettype(children[1]) != _type:
                 raise SyntaxError("Wrong argument type in indexing operation")

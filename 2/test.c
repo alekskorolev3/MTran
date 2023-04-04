@@ -1,13 +1,18 @@
 int main()
 {
 
-   int i[] = {1,2,3,4};
+
+   int a[] = {1,2,3,4};
+
+   int i = 0;
+
+   float x = 10 + 5;
 
    int b = i[0];
 
-   float c = 2.75;
+   int c = 2;
 
-   for (i = 1; i <= 20 + 3; i++)
+   for (i = 1; i <= c + 3; i++)
    {
       if (i == 1)
       {
@@ -26,4 +31,3 @@ int main()
    }
    return 0;
 }
-
