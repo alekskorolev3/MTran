@@ -50,10 +50,9 @@ class SemanticAnalyzer:
             else:
                 if _type is not None:
                     if _type != lt:
-                        raise SyntaxError("Type " + str(_type) + " cannot initialize " + str(lt))
+                        raise SyntaxError("Type " + str(_type) + " cannot initialized by " + str(lt))
                     return lt
                 return lt
-
 
         if tree_type == "arg":
             if _type is not None:
