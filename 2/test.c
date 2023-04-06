@@ -1,33 +1,25 @@
 int main()
 {
+   int i = 2;
 
+   float x = (123 + 8) + 2.66;
 
-   int a[] = {1,2,3,4};
+   x = i + 1.2;
 
-   int i = 0;
-
-   float x = 10 + 5;
-
-   int b = i[0];
+   int b = i[1];
 
    int c = 2;
 
-   for (i = 1; i <= c + 3; i++)
+   for (int i = 1; i <= 5; i++)
    {
-      if (i == 1)
-      {
-         printf(c);
-         continue;
-      }
-      if (i == 2)
-      {
-         printf(c);
-         continue;
-      }
-      c = (i + c) * 2;
-      c = i;
-      i = c;
+      int c = 2;
+
+
+      c = i * 2;
+
       printf(c);
    }
+
+   printf(x);
    return 0;
 }

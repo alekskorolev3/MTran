@@ -221,10 +221,10 @@ tree = parser.parse()
 
 print(tree)
 
-# semantic_analyzer = semantic_analyzer.SemanticAnalyzer()
-# semantic_analyzer.analyze(tree)
-#
-# interpreter = interpreter.Interpreter()
-# interpreter.exec(tree)
+semantic_analyzer = semantic_analyzer.SemanticAnalyzer()
+semantic_analyzer.analyze(tree)
+
+interpreter = interpreter.Interpreter()
+interpreter.exec(tree)
 
 
