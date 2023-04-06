@@ -13,6 +13,22 @@ class Interpreter:
                 if tree in self.local_scope[-1].keys():
                     tree_type = "variable"
                     children = self.local_scope[-1][tree]
+                else:
+                    i = 0
+                    for _s in reversed(self.local_scope):
+                        i = i - 1
+                        if tree in _s.keys():
+                            tree_type = "variable"
+                            children = self.local_scope[i][tree]
+                            continue
+
+                if tree_type is None:
+                    if tree in self.scope.keys():
+                        tree_type = "variable"
+                        children = self.scope[tree]
+                    else:
+                        return tree
+
             else:
                 if tree in self.scope.keys():
                     tree_type = "variable"
@@ -91,6 +107,32 @@ class Interpreter:
                 self.local_scope.pop()
                 return
 
+    def execConditional(self, tree, local_scope=None):
+        try:
+            tree_type = tree.type
+            children = tree.children
+        except AttributeError:
+            return tree
+
+        _cond = children[0]
+
+        if _cond.children[1] == "==":
+            if local_scope:
+                if self.execVal(_cond.children[0], True) == self.execVal(_cond.children[2], True):
+                    self.local_scope.append({})
+                    self.exec(children[1], True)
+                    self.local_scope.pop()
+                    return
+            else:
+                if self.execVal(_cond.children[0]) == self.execVal(_cond.children[2]):
+                    self.local_scope.append({})
+                    self.exec(children[1], True)
+                    self.local_scope.pop()
+                    return
+
+
+
+
     def exec(self, tree, local_scope=None):
         try:
             tree_type = tree.type
@@ -110,7 +152,6 @@ class Interpreter:
                     print(self.execVal(children[1].children[0]))
                     return
 
-
         if tree_type == "init":
             if local_scope:
                 self.local_scope[-1][children[1]] = self.execVal(children[-1])
@@ -123,13 +164,25 @@ class Interpreter:
                 if children[0] in self.local_scope[-1].keys():
                     self.local_scope[-1].update({children[0]: self.execVal(children[-1], True)})
                 else:
-                    self.scope.update({children[0]: self.execVal(children[-1], True)})
+                    i = 0
+                    for _s in reversed(self.local_scope):
+                        i = i - 1
+                        if children[0] in _s.keys():
+                            self.local_scope[i].update({children[0]: self.execVal(children[-1], True)})
+                            continue
             else:
                 self.scope.update({children[0]: self.execVal(children[-1])})
             return
 
         if tree_type == "for":
             self.execLoop(tree)
+            return
+
+        if tree_type == "if":
+            if local_scope:
+                self.execConditional(tree, True)
+            else:
+                self.execConditional(tree)
             return
 
         for child in children:

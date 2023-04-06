@@ -1,6 +1,6 @@
 int main()
 {
-   int i = 2;
+   int i = 20;
 
    float x = (123 + 8) + 2.66;
 
@@ -12,14 +12,16 @@ int main()
 
    for (int i = 1; i <= 5; i++)
    {
-      int c = 2;
+      int c = 2000;
 
 
-      c = i * 2;
+      if (i == 1)
+      {
+        c = 10;
+        printf(c);
+      }
 
       printf(c);
    }
-
-   printf(x);
    return 0;
 }
