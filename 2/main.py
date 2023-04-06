@@ -3,6 +3,7 @@ import prettytable
 import tokens
 import parser
 import semantic_analyzer
+import interpreter
 
 
 
@@ -218,8 +219,12 @@ lexical_analysis(t)
 parser = parser.Parser(t)
 tree = parser.parse()
 
-semantic_analyzer = semantic_analyzer.SemanticAnalyzer()
-semantic_analyzer.analyze(tree)
+print(tree)
 
+# semantic_analyzer = semantic_analyzer.SemanticAnalyzer()
+# semantic_analyzer.analyze(tree)
+#
+# interpreter = interpreter.Interpreter()
+# interpreter.exec(tree)
 
 

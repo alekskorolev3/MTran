@@ -121,7 +121,8 @@ def p_while_statement(p):
 
 
 def p_for_statement(p):
-    """for_statement : FOR LPAR assign SEMICOLON condition SEMICOLON change_val RPAR block"""
+    """for_statement : FOR LPAR assign SEMICOLON condition SEMICOLON change_val RPAR block
+    | FOR LPAR init SEMICOLON condition SEMICOLON change_val RPAR block"""
     p[0] = Node("for", [p[3], p[5], p[7], p[9]])
 
 
