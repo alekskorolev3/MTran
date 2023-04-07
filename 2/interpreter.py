@@ -4,10 +4,11 @@ class Interpreter:
         self.operations = "+-*/"
         self.local_scope = []
 
-    def execVal(self, tree, local_scope=None):
+    def execVal(self, tree, local_scope=None, index=None):
         try:
             tree_type = tree.type
             children = tree.children
+            index = index
         except AttributeError:
             if local_scope:
                 if tree in self.local_scope[-1].keys():
@@ -36,6 +37,12 @@ class Interpreter:
                 else:
                     return tree
 
+        if index is not None:
+            if index < len(children):
+                return children[index]
+            else:
+                raise IndexError("List index out of range")
+
         if tree_type == "variable":
             return children
 
@@ -51,6 +58,12 @@ class Interpreter:
                     _args.append(arg.children[0])
 
             return _args
+
+        if tree_type == "indexing_op":
+            if local_scope:
+                return self.execVal(children[0], True, self.execVal(children[1]))
+            else:
+                return self.execVal(children[0], None, self.execVal(children[1]))
 
         if tree_type in self.operations:
             if local_scope:
