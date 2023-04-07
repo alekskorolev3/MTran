@@ -138,13 +138,22 @@ class Interpreter:
                 self.local_scope.pop()
                 return
 
-    def execWhile(self, tree):
+    def execWhile(self, tree, _type=None):
         try:
             tree_type = tree.type
             children = tree.children
             self.local_scope.append({})
+            _type = _type
         except AttributeError:
             return tree
+
+        if _type:
+            _c = children[0]
+
+            children[0] = children[1]
+            children[1] = _c
+
+            self.exec(children[1], True)
 
         var = self.scope[children[0].children[0]]
 
@@ -394,7 +403,8 @@ class Interpreter:
             return
 
         if tree_type == "do_while":
-            print("here")
+            self.execWhile(tree, True)
+            return
 
         if tree_type == "while":
             self.execWhile(tree)
