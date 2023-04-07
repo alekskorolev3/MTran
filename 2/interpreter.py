@@ -52,8 +52,6 @@ class Interpreter:
 
             return _args
 
-
-
         if tree_type in self.operations:
             if local_scope:
                 left_op = self.execVal(children[0], True)
@@ -141,7 +139,6 @@ class Interpreter:
                     self.exec(children[1], True)
                     self.local_scope.pop()
 
-
         if _cond.children[1] == "<=":
             if local_scope:
                 if self.execVal(_cond.children[0], True) <= self.execVal(_cond.children[2], True):
@@ -154,7 +151,6 @@ class Interpreter:
                     self.local_scope.append({})
                     self.exec(children[1], True)
                     self.local_scope.pop()
-
 
         if _cond.children[1] == "<":
             if local_scope:
@@ -226,6 +222,71 @@ class Interpreter:
                         self.exec(children[3], True)
                         self.local_scope.pop()
                         return
+
+            if _cond.children[1] == "<=":
+                if local_scope:
+                    if self.execVal(_cond.children[0], True) > self.execVal(_cond.children[2], True):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+                else:
+                    if self.execVal(_cond.children[0]) > self.execVal(_cond.children[2]):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+            if _cond.children[1] == "<":
+                if local_scope:
+                    if self.execVal(_cond.children[0], True) >= self.execVal(_cond.children[2], True):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+                else:
+                    if self.execVal(_cond.children[0]) >= self.execVal(_cond.children[2]):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+            if _cond.children[1] == ">=":
+                if local_scope:
+                    if self.execVal(_cond.children[0], True) < self.execVal(_cond.children[2], True):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+                else:
+                    if self.execVal(_cond.children[0]) < self.execVal(_cond.children[2]):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+            if _cond.children[1] == ">":
+                if local_scope:
+                    if self.execVal(_cond.children[0], True) <= self.execVal(_cond.children[2], True):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+                else:
+                    if self.execVal(_cond.children[0]) <= self.execVal(_cond.children[2]):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+            if _cond.children[1] == "!=":
+                if local_scope:
+                    if self.execVal(_cond.children[0], True) == self.execVal(_cond.children[2], True):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
+
+                else:
+                    if self.execVal(_cond.children[0]) == self.execVal(_cond.children[2]):
+                        self.local_scope.append({})
+                        self.exec(children[3], True)
+                        self.local_scope.pop()
 
     def exec(self, tree, local_scope=None):
         try:
