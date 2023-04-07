@@ -140,11 +140,11 @@ def lexical_analysis(text):
                     else:
                         raise SyntaxError(str(token[0] + 1) + ":" + str(token[1]) + " Error: '" + str(
                             token[2]) + "' was not declared in this scope")
-                else:
-                    if set_of_tokens[i - 1][2] in tokens.datatypes:
-                        raise SyntaxError(
-                            str(token[0] + 1) + ":" + str(token[1]) + " Error: redeclaration of '" + str(
-                                token[2]) + "'")
+                # else:
+                #     if set_of_tokens[i - 1][2] in tokens.datatypes:
+                #         raise SyntaxError(
+                #             str(token[0] + 1) + ":" + str(token[1]) + " Error: redeclaration of '" + str(
+                #                 token[2]) + "'")
 
             if token[2] in tokens.operators:
                 if token[2] == '++':

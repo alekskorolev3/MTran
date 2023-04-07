@@ -1,7 +1,7 @@
 class Interpreter:
     def __init__(self):
         self.scope = dict()
-        self.operations = "+-*/"
+        self.operations = "+-*/%"
         self.local_scope = []
 
     def execVal(self, tree, local_scope=None, index=None):
@@ -14,7 +14,7 @@ class Interpreter:
                 if tree in self.local_scope[-1].keys():
                     tree_type = "variable"
                     children = self.local_scope[-1][tree]
-                else:
+                elif tree not in self.local_scope[-1].keys():
                     i = 0
                     for _s in reversed(self.local_scope):
                         i = i - 1
@@ -22,6 +22,12 @@ class Interpreter:
                             tree_type = "variable"
                             children = self.local_scope[i][tree]
                             continue
+
+                    if tree in self.scope.keys():
+                        tree_type = "variable"
+                        children = self.scope[tree]
+                    else:
+                        return tree
 
                 if tree_type is None:
                     if tree in self.scope.keys():
@@ -79,6 +85,8 @@ class Interpreter:
                 return left_op - right_op
             if tree_type == "*":
                 return left_op * right_op
+            if tree_type == "%":
+                return left_op % right_op
             if tree_type == "/":
                 if right_op == 0:
                     raise SyntaxError("Division by zero")
@@ -129,6 +137,44 @@ class Interpreter:
                     self.exec(tree.children[3], True)
                 self.local_scope.pop()
                 return
+
+    def execWhile(self, tree):
+        try:
+            tree_type = tree.type
+            children = tree.children
+            self.local_scope.append({})
+        except AttributeError:
+            return tree
+
+        var = self.scope[children[0].children[0]]
+
+        condition = self.execVal(children[0].children[-1])
+        condition_sign = children[0].children[1]
+
+        if condition_sign == ">":
+            while var > condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
+        if condition_sign == ">=":
+            while var >= condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
+        if condition_sign == "<":
+            while var < condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
+        if condition_sign == "<=":
+            while var < condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
+        if condition_sign == "==":
+            while var < condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
+        if condition_sign == "!=":
+            while var < condition:
+                self.exec(children[1], True)
+                var = self.scope[children[0].children[0]]
 
     def execConditional(self, tree, local_scope=None):
         try:
@@ -331,19 +377,27 @@ class Interpreter:
             if local_scope:
                 if children[0] in self.local_scope[-1].keys():
                     self.local_scope[-1].update({children[0]: self.execVal(children[-1], True)})
-                else:
+                elif children[0] not in self.local_scope[-1].keys():
                     i = 0
                     for _s in reversed(self.local_scope):
                         i = i - 1
                         if children[0] in _s.keys():
                             self.local_scope[i].update({children[0]: self.execVal(children[-1], True)})
                             continue
+                    self.scope.update({children[0]: self.execVal(children[-1])})
             else:
                 self.scope.update({children[0]: self.execVal(children[-1])})
             return
 
         if tree_type == "for":
             self.execLoop(tree)
+            return
+
+        if tree_type == "do_while":
+            print("here")
+
+        if tree_type == "while":
+            self.execWhile(tree)
             return
 
         if tree_type == "if":

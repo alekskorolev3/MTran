@@ -79,6 +79,7 @@ def p_semicolons(p):
 def p_multiline(p):
     """multiline : if_statement
                  | while_statement
+                 | do_while_statement
                  | for_statement"""
     p[0] = p[1]
 
@@ -120,6 +121,11 @@ def p_while_statement(p):
     p[0] = Node("while", [p[3], p[5]])
 
 
+def p_do_while_statement(p):
+    """do_while_statement : DO block WHILE LPAR condition RPAR SEMICOLON"""
+    p[0] = Node("do_while", [p[2], p[5]])
+
+
 def p_for_statement(p):
     """for_statement : FOR LPAR assign SEMICOLON condition SEMICOLON change_val RPAR block
     | FOR LPAR init SEMICOLON condition SEMICOLON change_val RPAR block"""
@@ -148,7 +154,7 @@ def p_cond_sign(p):
 
 def p_init(p):
     """init :
-    | DATA_TYPE ID SEMICOLON
+    | DATA_TYPE ID
     | DATA_TYPE ID EQUAL expr
     | DATA_TYPE ID EQUAL indexing_op
     | DATA_TYPE ID LCUADR RCUADR EQUAL array_init"""
@@ -207,7 +213,9 @@ def p_expr(p):
     | expr MOD fact
     | ID PLUSMINUS ID
     | ID PLUSMINUS fact
+    | expr PLUSMINUS ID
     | ID DIVMUL fact
+    | ID DIVMUL ID
     | fact DIVMUL ID
     | ID
     """

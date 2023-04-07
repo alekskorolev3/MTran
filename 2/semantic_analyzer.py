@@ -60,6 +60,9 @@ class SemanticAnalyzer:
                 if _type == "float" and type(children[0]).__name__ == "int":
                     return
 
+                if type(children[0]).__name__ == "str" and _type == "string":
+                    return
+
                 if type(children[0]).__name__ != _type:
                     raise SyntaxError("Type " + str(_type) + " cannot initialize " + str(children[0]))
                 return

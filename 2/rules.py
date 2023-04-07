@@ -33,6 +33,7 @@ tokens = (
     "FOR",
     "CONTINUE",
     "BREAK",
+    "DO"
 )
 
 identifier = r"[a-zA-Z]\w*"
@@ -43,6 +44,7 @@ types = {
     "double": "DATA_TYPE",
     "char": "DATA_TYPE",
     "void": "DATA_TYPE",
+    "string": "DATA_TYPE"
 }
 
 reserved = {
@@ -51,6 +53,7 @@ reserved = {
     "auto": "DATA_TYPE",
     "while": "WHILE",
     "for": "FOR",
+    "do": "DO",
     "break": "BREAK",
     "continue": "CONTINUE",
     "return": "RETURN",
