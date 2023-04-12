@@ -38,10 +38,6 @@ class Interpreter:
                     else:
                         return tree
 
-                if tree in self.scope.keys():
-                    tree_type = "variable"
-                    children = self.scope[tree]
-
             else:
                 if tree in self.scope.keys():
                     tree_type = "variable"
@@ -115,7 +111,7 @@ class Interpreter:
             if tree_type == "/":
                 if right_op == 0:
                     raise SyntaxError("Division by zero")
-                return left_op / right_op
+                return left_op // right_op
 
     def execLoop(self, tree):
         try:
@@ -138,26 +134,28 @@ class Interpreter:
 
         if change_val == "increment":
             if condition_sign == "<=":
-                for _var in range(var, condition, 1):
+                for _var in range(var, condition + 1, 1):
                     self.local_scope[-1][children[0].children[1]] = _var
                     self.exec(tree.children[3], True)
                 self.local_scope.pop()
                 return
             elif condition_sign == "<":
-                for _var in range(var, condition - 1, 1):
+                for _var in range(var, condition, 1):
+                    print("loop count" + str(_var))
                     self.local_scope[-1][children[0].children[1]] = _var
                     self.exec(tree.children[3], True)
+
                 self.local_scope.pop()
                 return
         elif change_val == "decrement":
             if condition_sign == ">=":
-                for _var in range(condition, var, -1):
+                for _var in range(condition + 1, var, -1):
                     self.local_scope[-1][children[0].children[1]] = _var
                     self.exec(tree.children[3], True)
                 self.local_scope.pop()
                 return
             elif condition_sign == ">":
-                for _var in range(condition - 1, var, -1):
+                for _var in range(condition, var, -1):
                     self.local_scope[-1][children[0].children[1]] = _var
                     self.exec(tree.children[3], True)
                 self.local_scope.pop()
@@ -198,15 +196,15 @@ class Interpreter:
                 self.exec(children[1], True)
                 var = self.scope[children[0].children[0]]
         if condition_sign == "<=":
-            while var < condition:
+            while var <= condition:
                 self.exec(children[1], True)
                 var = self.scope[children[0].children[0]]
         if condition_sign == "==":
-            while var < condition:
+            while var == condition:
                 self.exec(children[1], True)
                 var = self.scope[children[0].children[0]]
         if condition_sign == "!=":
-            while var < condition:
+            while var != condition:
                 self.exec(children[1], True)
                 var = self.scope[children[0].children[0]]
 
@@ -404,41 +402,49 @@ class Interpreter:
 
         if tree_type == "init":
             if local_scope:
-                self.local_scope[-1][children[1]] = self.execVal(children[-1])
+                if len(children) > 2:
+                    self.local_scope[-1][children[1]] = self.execVal(children[-1])
+                else:
+                    self.local_scope[-1][children[1]] = None
             else:
-                self.scope[children[1]] = self.execVal(children[-1])
+                if len(children) > 2:
+                    self.scope[children[1]] = self.execVal(children[-1])
+                else:
+                    self.scope[children[1]] = None
             return
 
         if tree_type == "assign":
 
-            if children[0].type == "indexing_op":
-                if local_scope:
+            if hasattr(children[0], 'type'):
+                if children[0].type == "indexing_op":
+                    if local_scope:
 
-                    arr = self.execVal(children[0].children[0], True)
+                        arr = self.execVal(children[0].children[0], True)
 
-                    index = self.execVal(children[0].children[1], True)
+                        index = self.execVal(children[0].children[1], True)
 
-                    arr[index] = self.execVal(children[-1], True)
+                        arr[index] = self.execVal(children[-1], True)
 
-                    if children[0].children[0] in self.local_scope[-1].keys():
-                        self.local_scope[-1].update({children[0].children[0]: arr})
-                    elif children[0].children[0] not in self.local_scope[-1].keys():
-                        i = 0
-                        for _s in reversed(self.local_scope):
-                            i = i - 1
-                            if children[0] in _s.keys():
-                                self.local_scope[i].update({children[0]: arr})
-                                continue
+                        if children[0].children[0] in self.local_scope[-1].keys():
+                            self.local_scope[-1].update({children[0].children[0]: arr})
+                        elif children[0].children[0] not in self.local_scope[-1].keys():
+                            i = 0
+                            for _s in reversed(self.local_scope):
+                                i = i - 1
+                                if children[0] in _s.keys():
+                                    self.local_scope[i].update({children[0]: arr})
+                                    continue
+                            self.scope.update({children[0].children[0]: arr})
+                    else:
+                        arr = self.execVal(children[0].children[0])
+
+                        index = self.execVal(children[0].children[1])
+
+                        arr[index] = self.execVal(children[-1])
+
                         self.scope.update({children[0].children[0]: arr})
-                else:
-                    arr = self.execVal(children[0].children[0])
+                    return
 
-                    index = self.execVal(children[0].children[1])
-
-                    arr[index] = self.execVal(children[-1])
-
-                    self.scope.update({children[0].children[0]: arr})
-                return
             else:
                 if local_scope:
                     if children[0] in self.local_scope[-1].keys():

@@ -216,6 +216,7 @@ def p_expr(p):
     | expr PLUSMINUS ID
     | ID DIVMUL fact
     | ID DIVMUL ID
+    | ID MOD ID
     | fact DIVMUL ID
     | ID
     """
