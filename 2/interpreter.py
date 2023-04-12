@@ -16,17 +16,19 @@ class Interpreter:
                     children = self.local_scope[-1][tree]
                 elif tree not in self.local_scope[-1].keys():
                     i = 0
+                    _break = False
                     for _s in reversed(self.local_scope):
                         i = i - 1
                         if tree in _s.keys():
                             tree_type = "variable"
                             children = self.local_scope[i][tree]
-                            continue
+                            _break = True
+                            break
 
                     if tree in self.scope.keys():
                         tree_type = "variable"
                         children = self.scope[tree]
-                    else:
+                    elif not _break:
                         return tree
 
                 if tree_type is None:
@@ -36,12 +38,32 @@ class Interpreter:
                     else:
                         return tree
 
+                if tree in self.scope.keys():
+                    tree_type = "variable"
+                    children = self.scope[tree]
+
             else:
                 if tree in self.scope.keys():
                     tree_type = "variable"
                     children = self.scope[tree]
                 else:
-                    return tree
+                    if tree in self.local_scope[-1].keys():
+                        tree_type = "variable"
+                        children = self.local_scope[-1][tree]
+                    elif tree not in self.local_scope[-1].keys():
+                        i = 0
+                        for _s in reversed(self.local_scope):
+                            i = i - 1
+                            if tree in _s.keys():
+                                tree_type = "variable"
+                                children = self.local_scope[i][tree]
+                                continue
+                    else:
+                        if tree in self.scope.keys():
+                            tree_type = "variable"
+                            children = self.scope[tree]
+                        else:
+                            return tree
 
         if index is not None:
             if index < len(children):
@@ -53,6 +75,9 @@ class Interpreter:
             return children
 
         if tree_type == "arg":
+            if hasattr(children[0], 'type'):
+                if children[0].type == "indexing_op":
+                    return self.execVal(children[0], True)
             return children[0]
 
         if tree_type == "array_init":
@@ -250,7 +275,9 @@ class Interpreter:
 
         if _cond.children[1] == ">":
             if local_scope:
-                if self.execVal(_cond.children[0], True) > self.execVal(_cond.children[2], True):
+                left_op = self.execVal(_cond.children[0], True)
+                right_op = self.execVal(_cond.children[2], True)
+                if left_op > right_op:
                     self.local_scope.append({})
                     self.exec(children[1], True)
                     self.local_scope.pop()
@@ -383,20 +410,50 @@ class Interpreter:
             return
 
         if tree_type == "assign":
-            if local_scope:
-                if children[0] in self.local_scope[-1].keys():
-                    self.local_scope[-1].update({children[0]: self.execVal(children[-1], True)})
-                elif children[0] not in self.local_scope[-1].keys():
-                    i = 0
-                    for _s in reversed(self.local_scope):
-                        i = i - 1
-                        if children[0] in _s.keys():
-                            self.local_scope[i].update({children[0]: self.execVal(children[-1], True)})
-                            continue
-                    self.scope.update({children[0]: self.execVal(children[-1])})
+
+            if children[0].type == "indexing_op":
+                if local_scope:
+
+                    arr = self.execVal(children[0].children[0], True)
+
+                    index = self.execVal(children[0].children[1], True)
+
+                    arr[index] = self.execVal(children[-1], True)
+
+                    if children[0].children[0] in self.local_scope[-1].keys():
+                        self.local_scope[-1].update({children[0].children[0]: arr})
+                    elif children[0].children[0] not in self.local_scope[-1].keys():
+                        i = 0
+                        for _s in reversed(self.local_scope):
+                            i = i - 1
+                            if children[0] in _s.keys():
+                                self.local_scope[i].update({children[0]: arr})
+                                continue
+                        self.scope.update({children[0].children[0]: arr})
+                else:
+                    arr = self.execVal(children[0].children[0])
+
+                    index = self.execVal(children[0].children[1])
+
+                    arr[index] = self.execVal(children[-1])
+
+                    self.scope.update({children[0].children[0]: arr})
+                return
             else:
-                self.scope.update({children[0]: self.execVal(children[-1])})
-            return
+                if local_scope:
+                    if children[0] in self.local_scope[-1].keys():
+                        self.local_scope[-1].update({children[0]: self.execVal(children[-1], True)})
+                    elif children[0] not in self.local_scope[-1].keys():
+                        i = 0
+                        for _s in reversed(self.local_scope):
+                            i = i - 1
+                            if children[0] in _s.keys():
+                                self.local_scope[i].update({children[0]: self.execVal(children[-1], True)})
+                                continue
+                        self.scope.update({children[0]: self.execVal(children[-1])})
+                else:
+                    self.scope.update({children[0]: self.execVal(children[-1])})
+                return
 
         if tree_type == "for":
             self.execLoop(tree)
