@@ -73,7 +73,7 @@ class Interpreter:
         if tree_type == "arg":
             if hasattr(children[0], 'type'):
                 if children[0].type == "indexing_op":
-                    return self.execVal(children[0], True)
+                    return self.execVal(children[0], local_scope if local_scope else None)
             return children[0]
 
         if tree_type == "array_init":
@@ -87,18 +87,11 @@ class Interpreter:
             return _args
 
         if tree_type == "indexing_op":
-            if local_scope:
-                return self.execVal(children[0], True, self.execVal(children[1]))
-            else:
-                return self.execVal(children[0], None, self.execVal(children[1]))
+            return self.execVal(children[0], local_scope if local_scope else None, self.execVal(children[1]))
 
         if tree_type in self.operations:
-            if local_scope:
-                left_op = self.execVal(children[0], True)
-                right_op = self.execVal(children[1], True)
-            else:
-                left_op = self.execVal(children[0])
-                right_op = self.execVal(children[1])
+            left_op = self.execVal(children[0], local_scope if local_scope else None)
+            right_op = self.execVal(children[1], local_scope if local_scope else None)
 
             if tree_type == "+":
                 return left_op + right_op
@@ -141,7 +134,6 @@ class Interpreter:
                 return
             elif condition_sign == "<":
                 for _var in range(var, condition, 1):
-                    print("loop count" + str(_var))
                     self.local_scope[-1][children[0].children[1]] = _var
                     self.exec(tree.children[3], True)
 
@@ -390,15 +382,9 @@ class Interpreter:
             return tree
 
         if tree_type == "func_call":
-
-            if local_scope:
-                if children[0] == "printf":
-                    print(self.execVal(children[1].children[0], True))
-                    return
-            else:
-                if children[0] == "printf":
-                    print(self.execVal(children[1].children[0]))
-                    return
+            if children[0] == "printf":
+                print(self.execVal(children[1].children[0], local_scope if local_scope else None))
+                return
 
         if tree_type == "init":
             if local_scope:
@@ -417,14 +403,10 @@ class Interpreter:
 
             if hasattr(children[0], 'type'):
                 if children[0].type == "indexing_op":
+                    arr = self.execVal(children[0].children[0], local_scope if local_scope else None)
+                    index = self.execVal(children[0].children[1], local_scope if local_scope else None)
+                    arr[index] = self.execVal(children[-1], local_scope if local_scope else None)
                     if local_scope:
-
-                        arr = self.execVal(children[0].children[0], True)
-
-                        index = self.execVal(children[0].children[1], True)
-
-                        arr[index] = self.execVal(children[-1], True)
-
                         if children[0].children[0] in self.local_scope[-1].keys():
                             self.local_scope[-1].update({children[0].children[0]: arr})
                         elif children[0].children[0] not in self.local_scope[-1].keys():
@@ -436,12 +418,6 @@ class Interpreter:
                                     continue
                             self.scope.update({children[0].children[0]: arr})
                     else:
-                        arr = self.execVal(children[0].children[0])
-
-                        index = self.execVal(children[0].children[1])
-
-                        arr[index] = self.execVal(children[-1])
-
                         self.scope.update({children[0].children[0]: arr})
                     return
 
@@ -474,15 +450,9 @@ class Interpreter:
             return
 
         if tree_type == "if":
-            if local_scope:
-                self.execConditional(tree, True)
-            else:
-                self.execConditional(tree)
+            self.execConditional(tree, local_scope if local_scope else None)
             return
 
         for child in children:
             if child != "=":
-                if local_scope:
-                    self.exec(child, True)
-                else:
-                    self.exec(child)
+                self.exec(child, local_scope if local_scope else None)
