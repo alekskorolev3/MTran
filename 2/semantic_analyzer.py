@@ -9,6 +9,8 @@ class SemanticAnalyzer:
             tree_type = tree.type
             children = tree.children
         except AttributeError:
+            if tree in self.variables.keys():
+                return self.variables.get(tree).get("type")
             return tree
 
         if tree_type == "arg":
@@ -67,6 +69,13 @@ class SemanticAnalyzer:
                     raise SyntaxError("Type " + str(_type) + " cannot initialize " + str(children[0]))
                 return
 
+            if hasattr(children[0], "type"):
+                if children[0].type == "indexing_op":
+                    _t = self.gettype(children[0].children[1])
+                    if _t != "int":
+                        raise SyntaxError("Wrong argument type in indexing operation")
+                return
+
         if tree_type == "array_init":
             self.analyze(children[0], _type)
             return
@@ -97,8 +106,24 @@ class SemanticAnalyzer:
             return
 
         if tree_type == "assign":
-            self.analyze(children[-1], self.variables.get(children[0]).get("type"))
+
+            if hasattr(children[0], "type"):
+                if children[0].type == "indexing_op":
+                    self.analyze(children[-1], self.variables.get(children[0].children[0]).get("type"))
+                    return
+            elif hasattr(children[-1], "type"):
+                if children[-1].type == "indexing_op":
+                    if hasattr(children[0], "type"):
+                        if children[0].type == "indexing_op":
+                            self.analyze(children[-1], self.variables.get(children[0].children[0]).get("type"))
+                            return
+                    else:
+                        self.analyze(children[-1], self.variables.get(children[0]).get("type"))
+                    return
+            else:
+                self.analyze(children[-1], self.variables.get(children[0]).get("type"))
             return
+
 
         for child in children:
             if child != "=":
